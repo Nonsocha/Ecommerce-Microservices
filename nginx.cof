@@ -1,0 +1,19 @@
+events {}
+
+http {
+  server {
+    listen 80;
+
+    location /products {
+      proxy_pass http://product-service;
+    }
+
+    location /cart {
+      proxy_pass http://cart-service;
+    }
+
+    location /orders {
+      proxy_pass http://order-service;
+    }
+  }
+}
