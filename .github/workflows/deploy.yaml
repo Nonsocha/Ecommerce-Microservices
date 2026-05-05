@@ -1,0 +1,69 @@
+name: Build and Deploy to ECR (GitOps)
+
+on: push
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: "707913648704.dkr.ecr.us-east-1.amazonaws.com"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set commit SHA
+        run: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # ---------------------------
+      # BUILD & PUSH IMAGES
+      # ---------------------------
+
+      - name: Build & Push Product Service
+        run: |
+          docker build -t product-service:${COMMIT_SHA} ./product-service
+          docker tag product-service:${COMMIT_SHA} $ECR_REGISTRY/product-service:${COMMIT_SHA}
+          docker push $ECR_REGISTRY/product-service:${COMMIT_SHA}
+
+      - name: Build & Push Cart Service
+        run: |
+          docker build -t cart-service:${COMMIT_SHA} ./cart-service
+          docker tag cart-service:${COMMIT_SHA} $ECR_REGISTRY/cart-service:${COMMIT_SHA}
+          docker push $ECR_REGISTRY/cart-service:${COMMIT_SHA}
+
+      - name: Build & Push Order Service
+        run: |
+          docker build -t order-service:${COMMIT_SHA} ./order-service
+          docker tag order-service:${COMMIT_SHA} $ECR_REGISTRY/order-service:${COMMIT_SHA}
+          docker push $ECR_REGISTRY/order-service:${COMMIT_SHA}
+
+      # ---------------------------
+      # UPDATE K8s MANIFESTS
+      # ---------------------------
+
+      - name: Update Kubernetes manifests
+        run: |
+          sed -i "s|product-service:.*|product-service:${COMMIT_SHA}|g" kubernetes/product-deployment.yaml
+          sed -i "s|cart-service:.*|cart-service:${COMMIT_SHA}|g" kubernetes/cart-deployment.yaml
+          sed -i "s|order-service:.*|order-service:${COMMIT_SHA}|g" kubernetes/order-deployment.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add kubernetes/
+          git commit -m "Update images to ${COMMIT_SHA}" || echo "No changes"
+          git push
+
