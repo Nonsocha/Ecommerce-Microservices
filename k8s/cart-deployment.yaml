@@ -10,10 +10,10 @@ spec:
   template:
     metadata:
       labels:
-        app: cart-service
+        app: 707913648704.dkr.ecr.us-east-1.amazonaws.com/product-service:e8ad237
     spec:
       containers:
         - name: cart-service
-          image: your-dockerhub/cart-service:latest
+          image: 
           ports:
             - containerPort: 3001
