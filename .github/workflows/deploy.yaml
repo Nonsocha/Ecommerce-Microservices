@@ -63,7 +63,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add kubernetes/
+          git add k8s/
           git commit -m "Update images to ${COMMIT_SHA}" || echo "No changes"
           git push
 
