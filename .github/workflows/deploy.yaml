@@ -6,6 +6,9 @@ env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: "707913648704.dkr.ecr.us-east-1.amazonaws.com"
 
+permissions:
+  contents: write  
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
