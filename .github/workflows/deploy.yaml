@@ -55,9 +55,9 @@ jobs:
 
       - name: Update Kubernetes manifests
         run: |
-          sed -i "s|product-service:.*|product-service:${COMMIT_SHA}|g" kubernetes/product-deployment.yaml
-          sed -i "s|cart-service:.*|cart-service:${COMMIT_SHA}|g" kubernetes/cart-deployment.yaml
-          sed -i "s|order-service:.*|order-service:${COMMIT_SHA}|g" kubernetes/order-deployment.yaml
+          sed -i "s|product-service:.*|product-service:${COMMIT_SHA}|g" k8s/product-deployment.yaml
+          sed -i "s|cart-service:.*|cart-service:${COMMIT_SHA}|g" k8s/cart-deployment.yaml
+          sed -i "s|order-service:.*|order-service:${COMMIT_SHA}|g" k8s/order-deployment.yaml
 
       - name: Commit and push changes
         run: |
