@@ -7,7 +7,7 @@ spec:
   project: default   # ✅ THIS IS WHAT YOU ARE MISSING
 
   source:
-    repoURL: https://github.com/Nonsocha/Ecommerce-Microservit
+    repoURL: https://github.com/Nonsocha/Ecommerce-Microservices.git
     targetRevision: HEAD
     path: k8s
 
